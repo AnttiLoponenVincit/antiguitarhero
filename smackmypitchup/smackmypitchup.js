@@ -39,6 +39,7 @@ var sounds = {
 	"G": 10,
 	"G#": 11
 };
+var noteCount = 0;
 var currentColor = "#000";
 var currentFreq;
 function LightenDarkenColor(col, amt) {
@@ -117,6 +118,10 @@ var RAND_TIME = 500;
 
 $(document).ready(function () {
 	$(document).on('pitchChanged', function (event, pitch, freq) {	
+		noteCount++;
+		if (noteCount > 100) {
+			$('.button').css({'opacity': (noteCount - 100)/100})
+		}
 		if (freq) {
 			glide.linTo(freq, "50ms");
 		}
@@ -171,6 +176,5 @@ $(document).ready(function () {
 			$('#button-text').css({'visibility': ''});
 		}
 		return false
-
 	});
 });

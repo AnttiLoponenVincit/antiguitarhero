@@ -33,6 +33,9 @@ img {
   animation: blink 1s steps(5, start) infinite;
   -webkit-animation: blink 1s steps(5, start) infinite;
 }
+.button {
+	opacity: 0;
+}
 @keyframes blink {
   to {
     visibility: hidden;
@@ -47,7 +50,7 @@ img {
 </head>
 <body>
 <img src="batman.jpg"/>
-<span id="button-text">DO NOT PRESS</span>
-<a href="#" id="red-button"></a>
+<span class="button" id="button-text">DO NOT PRESS</span>
+<a class="button" href="#" id="red-button"></a>
 </body>
 </html>
