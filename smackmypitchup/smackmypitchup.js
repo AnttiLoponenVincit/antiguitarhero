@@ -1,30 +1,23 @@
+// Timbre.js values
 var glide = T("param", {value:880});
-//var table = [200, [4800, 150], [2400, 500]];
-//var cutoff = T("env", {table:table}).bang();
 var cutoff = 1000;
 var VCO = T("saw", {freq:glide, mul:0.2});
 var VCF = T("lpf", {cutoff:cutoff, Q:20}, VCO);
 var EG  = T("adsr", {a:10, d:1500, s:1, r:500}, VCF).play();
+// PItch recognizion values
 var currentPitch;
 var currentAmp = 0;
 var initAmp = 0;
+var currentFreq;
+var RAND_LENGTH = 20;
+var RAND_TIME = 500;
+var pitchTimes = [];
+// Sample player values
+var bufferList;
+var bufferLoader;
 var SOUNDS_LENGTH = 13;
-var crazyMode = false;
+var isPlaying = false;
 
-var colors = {
-	"A": "#500000",
-	"A#": "#202000",
-	"B": "#005000",
-	"C": "#000050",
-	"C#": "#002020",
-	"D": "#404000",
-	"D#": "#200020",
-	"E": "#400040",
-	"F": "#004040",
-	"F#": "#103060",
-	"G": "#603010",
-	"G#": "#103010"
-};
 var sounds = {
 	"A": 0,
 	"A#": 1,
@@ -39,9 +32,28 @@ var sounds = {
 	"G": 10,
 	"G#": 11
 };
-var noteCount = 0;
+// Color change values
+var colors = {
+	"A": "#500000",
+	"A#": "#202000",
+	"B": "#005000",
+	"C": "#000050",
+	"C#": "#002020",
+	"D": "#404000",
+	"D#": "#200020",
+	"E": "#400040",
+	"F": "#004040",
+	"F#": "#103060",
+	"G": "#603010",
+	"G#": "#103010"
+};
 var currentColor = "#000";
-var currentFreq;
+// Crazy mode values
+var crazyMode = false;
+var noteCount = 0;
+
+
+/* This function copied from https://css-tricks.com/snippets/javascript/lighten-darken-color/ */
 function LightenDarkenColor(col, amt) {
   
     var usePound = false;
@@ -72,10 +84,9 @@ function LightenDarkenColor(col, amt) {
   
 }
 
-var bufferList;
-var bufferLoader;
+/* Load samples, copied mostly from http://www.html5rocks.com/en/tutorials/webaudio/intro/ */ 
 function initSounds() {
-  // Fix up prefixing
+
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
   context = new AudioContext();
 
@@ -87,17 +98,17 @@ function initSounds() {
   bufferLoader = new BufferLoader(
     context,
 	sounds,
+	/* Custom made callback */
     function (buffers) {
     	bufferList = buffers;
-    	console.log('sounds loaded');
     }
     );
 
   bufferLoader.load();
 }
 
-var isPlaying = false;
 
+/* Copied from http://www.html5rocks.com/en/tutorials/webaudio/intro/*/ 
 function playSound(buffer) {
 	isPlaying = true;
   var source = context.createBufferSource(); // creates a sound source
@@ -105,6 +116,7 @@ function playSound(buffer) {
   source.connect(context.destination);       // connect the source to the context's destination (the speakers)
   source.start(0);                           // play the source now
                                              // note: on older systems, may have to use deprecated noteOn(time);
+  // Added handler for removing duplicate samples
   source.onended = function () {
   	isPlaying = false;
   };
@@ -112,28 +124,30 @@ function playSound(buffer) {
 
 initSounds();
 
-var pitchTimes = [];
-var RAND_LENGTH = 20;
-var RAND_TIME = 500;
-
 $(document).ready(function () {
+	// Handler for changed pitch
 	$(document).on('pitchChanged', function (event, pitch, freq) {	
+		// add note count for activating crazy mode
 		noteCount++;
 		if (noteCount > 100) {
 			$('.button').css({'opacity': (noteCount - 100)/100})
 		}
+		// change synth freq
 		if (freq) {
 			glide.linTo(freq, "50ms");
 		}
+		// Change color according to note
 		currentColor = colors[pitch];
 		currentPitch = pitch;
 		if (!currentColor) {
 			currentColor = "#000";
 		}
+		// Check for random notes
 		pitchTimes.push(new Date().getTime());
 		if (pitchTimes.length  == RAND_LENGTH) {
-			// if we have enough pitches within a second
+			// check if we have too many notes too quickly
 			if (pitchTimes[RAND_LENGTH - 1] - pitchTimes[0] < RAND_TIME) {
+				// Pick up a random sample
 				var index = Math.floor((Math.random() * SOUNDS_LENGTH));
 				if (!isPlaying) {
 					playSound(bufferList[index]);
@@ -142,30 +156,37 @@ $(document).ready(function () {
 			pitchTimes.shift();
 		}
 	});
+	// Handler for changed amplitude
 	$(document).on('ampChanged', function (event, amp) {
 
+		// Adjust color lightness
 		$('body').css({'background-color': LightenDarkenColor(currentColor, amp * 10)});
 		amp = Math.round(amp*1000)/1000;
 
+		// In crazy mode play new sample
 		if (crazyMode) {
 			if (!isPlaying && currentPitch) {
 				playSound(bufferList[sounds[currentPitch]]);
 			}
 		} else {
+			// Trigger synth note
 			if (amp - currentAmp > 2) {
 				initAmp = amp;
 				EG.bang();
 			}
+			// Adjust filter cutoff to amplitude
 			if (amp > 0.01) {
 				var ampCutoff = amp/initAmp * 4600;
 				VCF.cutoff = Math.max(ampCutoff, 500);
 			}
+			// Release synth note when amplitude is low enough
 			if (amp < 0.1) {
 				EG.release();
 			}
 		}
 		currentAmp = amp;
 	});
+	// Toggle crazy mode
 	$('#red-button').on('click', function () {
 		crazyMode = !crazyMode;
 		if (crazyMode) {
