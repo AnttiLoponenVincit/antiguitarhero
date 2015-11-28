@@ -8,7 +8,7 @@ var EG  = T("adsr", {a:10, d:1500, s:1, r:500}, VCF).play();
 var currentFreq;
 var currentAmp = 0;
 var initAmp = 0;
-
+var SOUNDS_LENGTH = 13;
 
 var colors = {
 	"A": "#500000",
@@ -55,6 +55,49 @@ function LightenDarkenColor(col, amt) {
   
 }
 
+var bufferList;
+var bufferLoader;
+function initSounds() {
+  // Fix up prefixing
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  context = new AudioContext();
+
+  var sounds = [];
+  for (var i = 1; i < SOUNDS_LENGTH + 1; i++) {
+  	sounds.push('pasila/pasila' + i + '.wav')
+  }
+
+  bufferLoader = new BufferLoader(
+    context,
+	sounds,
+    function (buffers) {
+    	bufferList = buffers;
+    	console.log('sounds loaded');
+    }
+    );
+
+  bufferLoader.load();
+}
+
+var isPlaying = false;
+
+function playSound(buffer) {
+	isPlaying = true;
+  var source = context.createBufferSource(); // creates a sound source
+  source.buffer = buffer;                    // tell the source which sound to play
+  source.connect(context.destination);       // connect the source to the context's destination (the speakers)
+  source.start(0);                           // play the source now
+                                             // note: on older systems, may have to use deprecated noteOn(time);
+  source.onended = function () {
+  	isPlaying = false;
+  };
+}
+
+initSounds();
+
+var pitchTimes = [];
+var RAND_LENGTH = 20;
+var RAND_TIME = 500;
 
 $(document).ready(function () {
 	$(document).on('pitchChanged', function (event, pitch, freq) {	
@@ -64,6 +107,17 @@ $(document).ready(function () {
 				currentColor = colors[pitch];
 		if (!currentColor) {
 			currentColor = "#000";
+		}
+		pitchTimes.push(new Date().getTime());
+		if (pitchTimes.length  == RAND_LENGTH) {
+			// if we have enough pitches within a second
+			if (pitchTimes[RAND_LENGTH - 1] - pitchTimes[0] < RAND_TIME) {
+				var index = Math.floor((Math.random() * SOUNDS_LENGTH));
+				if (!isPlaying) {
+					playSound(bufferList[index]);
+				}
+			}
+			pitchTimes.shift();
 		}
 	});
 	$(document).on('ampChanged', function (event, amp) {
