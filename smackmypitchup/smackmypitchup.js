@@ -169,9 +169,11 @@ $(document).ready(function () {
 	$('#red-button').on('click', function () {
 		crazyMode = !crazyMode;
 		if (crazyMode) {
+			$('img').attr('src', 'repomies.jpg');
 			$(this).css({"background-position-x": '146px'});
 			$('#button-text').css({'visibility': 'hidden'});
 		} else {
+			$('img').attr('src', 'synth.png');
 			$(this).css({"background-position-x": '0'});
 			$('#button-text').css({'visibility': ''});
 		}
