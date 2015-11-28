@@ -5,10 +5,11 @@ var cutoff = 1000;
 var VCO = T("saw", {freq:glide, mul:0.2});
 var VCF = T("lpf", {cutoff:cutoff, Q:20}, VCO);
 var EG  = T("adsr", {a:10, d:1500, s:1, r:500}, VCF).play();
-var currentFreq;
+var currentPitch;
 var currentAmp = 0;
 var initAmp = 0;
 var SOUNDS_LENGTH = 13;
+var crazyMode = false;
 
 var colors = {
 	"A": "#500000",
@@ -24,7 +25,22 @@ var colors = {
 	"G": "#603010",
 	"G#": "#103010"
 };
+var sounds = {
+	"A": 0,
+	"A#": 1,
+	"B": 2,
+	"C": 3,
+	"C#": 4,
+	"D": 5,
+	"D#": 6,
+	"E": 7,
+	"F": 8,
+	"F#": 9,
+	"G": 10,
+	"G#": 11
+};
 var currentColor = "#000";
+var currentFreq;
 function LightenDarkenColor(col, amt) {
   
     var usePound = false;
@@ -104,7 +120,8 @@ $(document).ready(function () {
 		if (freq) {
 			glide.linTo(freq, "50ms");
 		}
-				currentColor = colors[pitch];
+		currentColor = colors[pitch];
+		currentPitch = pitch;
 		if (!currentColor) {
 			currentColor = "#000";
 		}
@@ -125,17 +142,35 @@ $(document).ready(function () {
 		$('body').css({'background-color': LightenDarkenColor(currentColor, amp * 10)});
 		amp = Math.round(amp*1000)/1000;
 
-		if (amp - currentAmp > 2) {
-			initAmp = amp;
-			EG.bang();
-		}
-		if (amp > 0.01) {
-			var ampCutoff = amp/initAmp * 4600;
-			VCF.cutoff = Math.max(ampCutoff, 500);
-		}
-		if (amp < 0.1) {
-			EG.release();
+		if (crazyMode) {
+			if (!isPlaying && currentPitch) {
+				playSound(bufferList[sounds[currentPitch]]);
+			}
+		} else {
+			if (amp - currentAmp > 2) {
+				initAmp = amp;
+				EG.bang();
+			}
+			if (amp > 0.01) {
+				var ampCutoff = amp/initAmp * 4600;
+				VCF.cutoff = Math.max(ampCutoff, 500);
+			}
+			if (amp < 0.1) {
+				EG.release();
+			}
 		}
 		currentAmp = amp;
+	});
+	$('#red-button').on('click', function () {
+		crazyMode = !crazyMode;
+		if (crazyMode) {
+			$(this).css({"background-position-x": '146px'});
+			$('#button-text').css({'visibility': 'hidden'});
+		} else {
+			$(this).css({"background-position-x": '0'});
+			$('#button-text').css({'visibility': ''});
+		}
+		return false
+
 	});
 });

@@ -14,9 +14,40 @@ img {
 	opacity: 0.2;
 	width: 100%;
 }
+#red-button {
+	background-image: url('red-button.png');
+	position: absolute;
+	width: 144px;
+	height: 160px;
+	display: block;
+	left: 45%;
+	top: 45%;
+}
+#button-text {
+	position: absolute;
+	width: 100%;
+	top: 40%;
+	text-align: center;
+	font-family: "Comic Sans MS";
+	color: #f00;
+  animation: blink 1s steps(5, start) infinite;
+  -webkit-animation: blink 1s steps(5, start) infinite;
+}
+@keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
+@-webkit-keyframes blink {
+  to {
+    visibility: hidden;
+  }
+}
 </style>
 </head>
 <body>
 <img src="batman.jpg"/>
+<span id="button-text">DO NOT PRESS</span>
+<a href="#" id="red-button"></a>
 </body>
 </html>
