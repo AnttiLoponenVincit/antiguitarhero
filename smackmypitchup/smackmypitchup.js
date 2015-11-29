@@ -129,6 +129,7 @@ $(document).ready(function () {
 	// Handler for changed pitch
 	$(document).on('pitchChanged', function (event, pitch, freq) {	
 		// add note count for activating crazy mode
+		$('#pitch').text(pitch);
 		noteCount++;
 		if (noteCount > CRAZY_MODE_THRESHOLD) {
 			$('.button').css({'opacity': (noteCount - CRAZY_MODE_THRESHOLD)/100})
@@ -148,6 +149,7 @@ $(document).ready(function () {
 		if (pitchTimes.length  == RAND_LENGTH) {
 			// check if we have too many notes too quickly
 			if (pitchTimes[RAND_LENGTH - 1] - pitchTimes[0] < RAND_TIME) {
+				$('#pitch').text('?!');
 				// Pick up a random sample
 				var index = Math.floor((Math.random() * SOUNDS_LENGTH));
 				if (!isPlaying) {
@@ -190,6 +192,8 @@ $(document).ready(function () {
 	// Toggle crazy mode
 	$('#red-button').on('click', function () {
 		crazyMode = !crazyMode;
+			$('#pitch').toggle();
+			$('#waveform').toggle();
 		if (crazyMode) {
 			$('img').attr('src', 'repomies.jpg');
 			$(this).css({"background-position-x": '146px'});
