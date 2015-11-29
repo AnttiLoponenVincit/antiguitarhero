@@ -1,8 +1,9 @@
 // Timbre.js values
 var glide = T("param", {value:880});
 var cutoff = 1000;
-var VCO = T("saw", {freq:glide, mul:0.2});
-var VCF = T("lpf", {cutoff:cutoff, Q:20}, VCO);
+var VCO = T("osc", {wave: "saw", freq:glide, mul:0.2});
+var resonance = 20;
+var VCF = T("lpf", {cutoff:cutoff, Q:resonance}, VCO);
 var EG  = T("adsr", {a:10, d:1500, s:1, r:500}, VCF).play();
 // PItch recognizion values
 var currentPitch;
@@ -17,6 +18,7 @@ var bufferList;
 var bufferLoader;
 var SOUNDS_LENGTH = 13;
 var isPlaying = false;
+VCO.wave = "saw";
 
 var sounds = {
 	"A": 0,
@@ -53,6 +55,8 @@ var crazyMode = false;
 var noteCount = 0;
 var CRAZY_MODE_THRESHOLD = 200;
 
+var cutoff = 2600;
+var dynamic = true;
 
 /* This function copied from https://css-tricks.com/snippets/javascript/lighten-darken-color/ */
 function LightenDarkenColor(col, amt) {
@@ -183,8 +187,8 @@ $(document).ready(function () {
 				EG.bang();
 			}
 			// Adjust filter cutoff to amplitude
-			if (amp > 0.01) {
-				var ampCutoff = amp/initAmp * 4600;
+			if (amp > 0.01 && dynamic) {
+				var ampCutoff = amp/initAmp * cutoff;
 				VCF.cutoff = Math.max(ampCutoff, 500);
 			}
 			// Release synth note when amplitude is low enough
@@ -212,4 +216,35 @@ $(document).ready(function () {
 		}
 		return false
 	});
+
+    $( "#cutoff" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: 1000,
+      max: 6000,
+      value: cutoff,
+      slide: function( event, ui ) {
+        cutoff = ui.value;
+        if (!dynamic) {
+        	VCF.cutoff = cutoff;
+        }
+      }
+    });
+    $( "#resonance" ).slider({
+      orientation: "vertical",
+      range: "min",
+      min: 0,
+      max: 50,
+      value: resonance,
+      slide: function( event, ui ) {
+        VCF.Q = ui.value;
+      }
+    });
+    $('#autowah').on('click', function () {
+    	dynamic = !dynamic;
+    }); 
+    $('.waveform-select').on('click', function () {
+    	VCO.wave = $(this).val();
+    }); 
+
 });

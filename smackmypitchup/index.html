@@ -3,12 +3,16 @@
 <title>SMACK MY PITCH UP</title>
 <script type="text/javascript" src="http://www.html5rocks.com/en/tutorials/webaudio/intro/js/buffer-loader.js"></script>
 <script type="text/javascript" src="../jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="../jquery-ui.min.js"></script>
 <script type="text/javascript" src="../pitchdetect-fork.js"></script>
 <script type="text/javascript" src="../timbre.js"></script>
 <script type="text/javascript" src="smackmypitchup.js"></script>
+<link rel="stylesheet" type="text/css" href="../jquery-ui.min.css"/>
 <style type="text/css">
 body {
 	background-color: #000;
+	font-family: "courier new";
+	color: #ccc;
 }
 img {
 	opacity: 0.2;
@@ -60,6 +64,46 @@ img {
     font-family: "Courier new";
     color: #777;
 }
+#cutoff {
+    height: 160px;
+}
+#resonance {
+    height: 160px;
+}
+#filter-container {
+    position: absolute;
+    top: 330px;
+    left: 60px;
+    height: 239px;
+    width: 119px;
+}
+#filter-container h2 {
+	margin: 5px;
+	font-size: 15px;
+}
+#cutoff-container {
+	position: absolute;
+	left: 0;
+}
+#resonance-container {
+	position: absolute;
+	left: 50px;
+}
+#autowah-container {
+	position: absolute;
+	top: 213px;
+}
+#waveform-container {
+    position: absolute;
+    top: 330px;
+    left: 180px;
+    height: 239px;
+    width: 119px;
+}
+#waveform-container h2 {
+	margin: 5px;
+	font-size: 15px;
+}
 </style>
 </head>
 <body>
@@ -68,5 +112,32 @@ img {
 <a class="button" href="#" id="red-button"></a>
 <span id="pitch"></span>
 <canvas id="waveform" width="460" height="240"></canvas>
+<div id="filter-container">
+	<h2>Filter</h2>
+	<div id="cutoff-container">
+		<span id="cutoff-title">Freq</span>
+		<div id="cutoff"></div>
+	</div>
+	<div id="resonance-container">
+		<span id="cutoff-title">Res</span>
+		<div id="resonance"></div>
+	</div>
+	
+	<label id="autowah-container" for="autowah">Dynamic <input type="checkbox" id="autowah" checked="true"/></label>
+</div>
+<div id="vco-container">
+	<h2>VCO</h2>
+		<div id="waveform-container">
+		<span id="waveform-title">Waveform</span><br/>
+		<input type="radio" name="waveform-select" class="waveform-select" value="saw" id="wave-saw" checked="checked"/><label for="wave-saw">Saw</label><br/>
+		<input type="radio" name="waveform-select" class="waveform-select" value="pulse" id="wave-pulse"/><label for="wave-pulse">Pulse</label><br/>
+		<input type="radio" name="waveform-select" class="waveform-select" value="tri" id="wave-tri"/><label for="wave-tri">Tri</label><br/>
+				<input type="radio" name="waveform-select" class="waveform-select" value="sin" id="wave-sin"/><label for="wave-sin">Sin</label><br/>
+	
+
+	</div>
+
+</div>
+
 </body>
 </html>
