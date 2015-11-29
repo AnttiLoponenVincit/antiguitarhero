@@ -51,6 +51,7 @@ var currentColor = "#000";
 // Crazy mode values
 var crazyMode = false;
 var noteCount = 0;
+var CRAZY_MODE_THRESHOLD = 200;
 
 
 /* This function copied from https://css-tricks.com/snippets/javascript/lighten-darken-color/ */
@@ -129,8 +130,8 @@ $(document).ready(function () {
 	$(document).on('pitchChanged', function (event, pitch, freq) {	
 		// add note count for activating crazy mode
 		noteCount++;
-		if (noteCount > 100) {
-			$('.button').css({'opacity': (noteCount - 100)/100})
+		if (noteCount > CRAZY_MODE_THRESHOLD) {
+			$('.button').css({'opacity': (noteCount - CRAZY_MODE_THRESHOLD)/100})
 		}
 		// change synth freq
 		if (freq) {

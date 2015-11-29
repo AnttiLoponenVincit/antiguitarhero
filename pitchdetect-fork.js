@@ -48,6 +48,12 @@ var newFreq;
 window.onload = function() {
 	audioContext = new AudioContext();
 	MAX_SIZE = Math.max(4,Math.floor(audioContext.sampleRate/5000));	// corresponds to a 5kHz signal
+	DEBUGCANVAS = document.getElementById( "waveform" );
+	if (DEBUGCANVAS) {
+		waveCanvas = DEBUGCANVAS.getContext("2d");
+		waveCanvas.strokeStyle = "black";
+		waveCanvas.lineWidth = 1;
+	}
 	toggleLiveInput();
 }
 
@@ -190,6 +196,17 @@ function updatePitch( time ) {
 	var cycles = new Array;
 	analyser.getFloatTimeDomainData( buf );
 	var ac = autoCorrelate( buf, audioContext.sampleRate );
+
+	if (DEBUGCANVAS) {  // This draws the current waveform, useful for debugging
+		waveCanvas.clearRect(0,0,460,240);
+		waveCanvas.strokeStyle = "white";
+		waveCanvas.beginPath();
+		waveCanvas.moveTo(0,120);
+		for (var i=1;i<460;i++) {
+			waveCanvas.lineTo(i,120+(buf[i]*120));
+		}
+		waveCanvas.stroke();
+	}
 
 	if (!window.requestAnimationFrame)
 		window.requestAnimationFrame = window.webkitRequestAnimationFrame;
