@@ -132,7 +132,7 @@ $(document).ready(function () {
 		$('#pitch').text(pitch);
 		noteCount++;
 		if (noteCount > CRAZY_MODE_THRESHOLD) {
-			$('.button').css({'opacity': (noteCount - CRAZY_MODE_THRESHOLD)/100})
+			$('.button').css({'opacity': Math.min(0.8, (noteCount - CRAZY_MODE_THRESHOLD)/100)});
 		}
 		// change synth freq
 		if (freq) {
@@ -161,9 +161,14 @@ $(document).ready(function () {
 	});
 	// Handler for changed amplitude
 	$(document).on('ampChanged', function (event, amp) {
+		if (amp < 0.05) {
+			$('#pitch').text("");
+			$('body').css({'background-color': LightenDarkenColor('#111', amp * 10)});
+		} else {
+			// Adjust color lightness
+			$('body').css({'background-color': LightenDarkenColor(currentColor, amp * 10)});			
+		}
 
-		// Adjust color lightness
-		$('body').css({'background-color': LightenDarkenColor(currentColor, amp * 10)});
 		amp = Math.round(amp*1000)/1000;
 
 		// In crazy mode play new sample
@@ -186,6 +191,7 @@ $(document).ready(function () {
 			if (amp < 0.1) {
 				EG.release();
 			}
+
 		}
 		currentAmp = amp;
 	});
@@ -198,6 +204,7 @@ $(document).ready(function () {
 			$('img').attr('src', 'repomies.jpg');
 			$(this).css({"background-position-x": '146px'});
 			$('#button-text').css({'visibility': 'hidden'});
+
 		} else {
 			$('img').attr('src', 'synth.png');
 			$(this).css({"background-position-x": '0'});
