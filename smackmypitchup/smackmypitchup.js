@@ -204,6 +204,8 @@ $(document).ready(function () {
 		crazyMode = !crazyMode;
 			$('#pitch').toggle();
 			$('#waveform').toggle();
+			$('#filter-container').toggle();
+			$('#vco-container').toggle();
 		if (crazyMode) {
 			$('img').attr('src', 'repomies.jpg');
 			$(this).css({"background-position-x": '146px'});
